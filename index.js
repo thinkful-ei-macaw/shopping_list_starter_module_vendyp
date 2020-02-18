@@ -1,12 +1,15 @@
+'use strict';
+
 const store = {
   items: [
-    { id: cuid(), name: 'apples', checked: false },
-    { id: cuid(), name: 'oranges', checked: false },
-    { id: cuid(), name: 'milk', checked: true },
-    { id: cuid(), name: 'bread', checked: false }
+    { id: cuid(), name: 'apples', checked: false, edit: false},
+    { id: cuid(), name: 'oranges', checked: false, edit: false},
+    { id: cuid(), name: 'milk', checked: true, edit: false},
+    { id: cuid(), name: 'bread', checked: false, edit: false}
   ],
   hideCheckedItems: false
 };
+
 
 const generateItemElement = function (item) {
   let itemTitle = `<span class='shopping-item shopping-item__checked'>${item.name}</span>`;
@@ -95,6 +98,11 @@ const getItemIdFromElement = function (item) {
     .data('item-id');
 };
 
+const generateEditItemPage = function(item){
+  return `<span class='shopping-item shopping-item__checked'>${item.name}</span> 
+    <button type="button" class="js-newAddition">Submit</button>`;
+};
+
 /**
  * Responsible for deleting a list item.
  * @param {string} id 
@@ -145,6 +153,36 @@ const handleToggleFilterClick = function () {
   });
 };
 
+
+/**
+ * Places an event listener on the text item 
+ * the user clicked on for editing the field.
+ */
+const handleEditItemTextClick = function(){
+
+  $('body').on('click', '.shopping-item', function(){
+
+    store.items.edit = true;
+    
+    let itemName = $(this);
+    console.log(itemName);
+
+    let inputName = $('<input/>').val(itemName.text() );
+    itemName.replaceWith(inputName);
+
+
+    if(store.items.edit === true){
+      generateEditItemPage(itemName);
+    } else{
+      //do nothing
+    }
+  });
+
+};
+
+
+
+
 /**
  * This function will be our callback when the
  * page loads. It is responsible for initially 
@@ -160,6 +198,7 @@ const handleShoppingList = function () {
   handleItemCheckClicked();
   handleDeleteItemClicked();
   handleToggleFilterClick();
+  handleEditItemTextClick();
 };
 
 // when the page loads, call `handleShoppingList`
