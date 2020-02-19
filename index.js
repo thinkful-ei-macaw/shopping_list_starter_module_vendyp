@@ -18,10 +18,10 @@ const generateItemElement = function (item) {
      <span class='shopping-item'>${item.name}</span>
     `;
   }
-
   return `
     <li class='js-item-element' data-item-id='${item.id}'>
-      ${itemTitle}
+      ${item.edit ? '<input value="'+item.name+'"/> <button class="updateItem">Submit</button>' : itemTitle}
+
       <div class='shopping-item-controls'>
         <button class='shopping-item-toggle js-item-toggle'>
           <span class='button-label'>check</span>
@@ -98,10 +98,6 @@ const getItemIdFromElement = function (item) {
     .data('item-id');
 };
 
-const generateEditItemPage = function(item){
-  return `<span class='shopping-item shopping-item__checked'>${item.name}</span> 
-    <button type="button" class="js-newAddition">Submit</button>`;
-};
 
 /**
  * Responsible for deleting a list item.
@@ -162,24 +158,41 @@ const handleEditItemTextClick = function(){
 
   $('body').on('click', '.shopping-item', function(){
 
-    store.items.edit = true;
-    
-    let itemName = $(this);
-    console.log(itemName);
-
-    let inputName = $('<input/>').val(itemName.text() );
-    itemName.replaceWith(inputName);
-
-
-    if(store.items.edit === true){
-      generateEditItemPage(itemName);
-    } else{
-      //do nothing
+    let currentID =$(this).parent().attr('data-item-id');
+//update state
+    for(let i = 0; i < store.items.length; i++){
+      if(store.items[i].id === currentID){
+        store.items[i].edit = true;
+      }
     }
+    handleShoppingList();
+
   });
 
 };
 
+/**
+ * Places an event listener on the submit new item 
+ * the user clicked on for submitting the field.
+ */
+const handleSubmitNewText = function(){
+
+  $('.updateItem').on('click', function(){
+    let currentID = $(this).parent().attr('data-item-id');
+    let newTextItem = $(this).parent().find('input').val();
+    
+    //update state
+
+    for(let i = 0; i < store.items.length; i++){
+      if(store.items[i].id === currentID){
+        store.items[i].name = newTextItem;
+        store.items[i].edit = false;
+      }
+    }
+    handleShoppingList();
+  });
+
+};
 
 
 
@@ -199,6 +212,7 @@ const handleShoppingList = function () {
   handleDeleteItemClicked();
   handleToggleFilterClick();
   handleEditItemTextClick();
+  handleSubmitNewText();
 };
 
 // when the page loads, call `handleShoppingList`
